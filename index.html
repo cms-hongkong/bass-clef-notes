@@ -202,7 +202,7 @@
     <h1 id="main-title">CMS認音大挑戰</h1>
     
     <div class="stats-bar">
-        <div class="badge" id="lv-display">LV 5</div>
+        <div class="badge" id="lv-display">LV 1</div>
         <div class="badge" id="count-display">1 / 10</div>
         <div class="badge">⭐ <span id="score-val">0</span></div>
     </div>
@@ -302,22 +302,25 @@
             ctx.lineTo(900, y); 
             ctx.stroke();
 
-            /* 線編號縮小10倍並移到最左邊 */
-            /* 修正 Y 位置微調由 +6 改為 +10 確保更置中 */
-            ctx.fillStyle = "#E63946"; 
-            ctx.font = `bold ${s * 0.22}px var(--text-serif)`; /* 稍微調大到 20px 左右確保睇得到但唔會巨大 */
-            ctx.textAlign = "center";
-            ctx.fillText(i + 1, 40, y + 10); /* 移到左邊 X=40 避免同譜號重疊 */
+            /* 線編號縮小10倍：固定 60px 大小，並移到 X=30 處 */
+            ctx.font = "60px var(--text-serif)";
+            ctx.fillStyle = "#E63946"; // 紅色
+            ctx.textAlign = "left";
+            /* 讓數字 1 號開始標註，Y 座標 +18 垂直居中對齊線條 */
+            ctx.fillText(i + 1, 30, y + 18);
         }
 
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
+        /* 低音譜號縮小 10% */
         ctx.font = `${s * 6.75}px serif`; 
+        /* 低音譜號下移 80px */
         ctx.fillText("𝄢", 110, clefLine4Y + 35 + 80); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
             const y = baseTopY + (steps * (s / 2));
+            /* 音符右移 40px */
             const x = canvas.width / 2 + 90; 
 
             ctx.fillStyle = "black";
