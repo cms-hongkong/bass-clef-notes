@@ -202,7 +202,7 @@
     <h1 id="main-title">CMS認音大挑戰</h1>
     
     <div class="stats-bar">
-        <div class="badge" id="lv-display">LV 1</div>
+        <div class="badge" id="lv-display">LV 5</div>
         <div class="badge" id="count-display">1 / 10</div>
         <div class="badge">⭐ <span id="score-val">0</span></div>
     </div>
@@ -302,11 +302,12 @@
             ctx.lineTo(900, y); 
             ctx.stroke();
 
-            /* 線編號縮小10倍，調整為間距的9%，並微調 Y 位置 */
-            ctx.fillStyle = "#E63946"; // 紅色
-            ctx.font = `${s * 0.09}px var(--text-serif)`;
-            ctx.textAlign = "left";
-            ctx.fillText(i + 1, 65, y + 6);
+            /* 線編號縮小10倍並移到最左邊 */
+            /* 修正 Y 位置微調由 +6 改為 +10 確保更置中 */
+            ctx.fillStyle = "#E63946"; 
+            ctx.font = `bold ${s * 0.22}px var(--text-serif)`; /* 稍微調大到 20px 左右確保睇得到但唔會巨大 */
+            ctx.textAlign = "center";
+            ctx.fillText(i + 1, 40, y + 10); /* 移到左邊 X=40 避免同譜號重疊 */
         }
 
         const clefLine4Y = baseTopY + 3 * s;
