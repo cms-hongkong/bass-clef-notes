@@ -295,7 +295,6 @@
         ctx.strokeStyle = "#333";
         ctx.lineWidth = 5;
         
-        /* 線條從上往下畫 */
         for (let i = 0; i < curLv; i++) {
             let y = baseTopY + (i * s); 
             ctx.beginPath(); 
@@ -303,11 +302,13 @@
             ctx.lineTo(900, y); 
             ctx.stroke();
 
-            /* 在線條左側加上編號標籤 */
-            ctx.fillStyle = "#604439"; // wood-brown
-            ctx.font = "bold 20px var(--text-serif)";
+            /* 線編號改為紅色，大小為間距的90% */
+            const fontSize = s * 0.9;
+            ctx.fillStyle = "#E63946"; // 紅色
+            ctx.font = `${fontSize}px var(--text-serif)`;
             ctx.textAlign = "left";
-            ctx.fillText(i + 1, 65, y + 8);
+            /* Y 座標微調：線條 Y + 字體大小的 0.6 倍，達到垂直置中對齊 */
+            ctx.fillText(i + 1, 65, y + (fontSize * 0.6));
         }
 
         const clefLine4Y = baseTopY + 3 * s;
