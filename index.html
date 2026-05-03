@@ -10,7 +10,6 @@
             --leaf-green: #74C69D;
             --wood-brown: #604439;
             --sand-light: #F8F4E3;
-            /* 強制使用明體系列 */
             --text-serif: "PMingLiU", "SimSun", "Times New Roman", serif;
         }
 
@@ -107,18 +106,27 @@
             box-shadow: 0 2px 0 var(--wood-brown);
         }
 
-        .animal-img {
+        /* 圖片容器：若圖片失效可顯示 Emoji */
+        .img-container {
             width: 90px;
             height: 90px;
-            object-fit: contain;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem; /* Emoji 大小 */
             margin-bottom: 5px;
         }
 
+        .animal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
         .letter-name {
-            font-size: 3rem; /* 字母放大 50% */
+            font-size: 3rem; 
             font-weight: bold;
             color: var(--wood-brown);
-            font-family: var(--text-serif);
         }
 
         #overlay {
@@ -161,15 +169,6 @@
             margin: 15px 0;
         }
 
-        #rank-view {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 95%;
-            height: 100%;
-            justify-content: center;
-        }
-
         .rank-table {
             width: 100%;
             border-collapse: collapse;
@@ -177,14 +176,6 @@
         }
         .rank-table th { background: var(--leaf-green); padding: 12px; color: white; }
         .rank-table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-
-        .tab-group {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
 
         .tab-btn {
             font-family: var(--text-serif);
@@ -214,7 +205,7 @@
     <div id="overlay">
         <div id="menu-view">
             <h1 style="font-size: 3rem; margin-bottom: 20px;">CMS認音大挑戰</h1>
-            <p style="color: var(--wood-brown); font-weight: bold; font-size: 1.2rem;">挑戰開始！請選擇等級（低音篇）：</p>
+            <p style="color: var(--wood-brown); font-weight: bold; font-size: 1.2rem;">請選擇學習等級（低音由上而下）：</p>
             <div style="display: flex; flex-wrap: wrap; justify-content: center; max-width: 700px;">
                 <button class="btn-forest" onclick="startGame(1)">Level 1 (C, B, A)</button>
                 <button class="btn-forest" onclick="startGame(2)">Level 2 (C - F)</button>
@@ -229,33 +220,20 @@
             <h2 id="result-title" style="font-size: 3.5rem; color: var(--forest-green); margin-bottom: 10px;">太利害啦！</h2>
             <p id="result-text" style="font-size: 1.8rem; margin: 5px 0;"></p>
             <p id="time-text" style="color: var(--wood-brown); font-weight: bold; font-size: 1.3rem;"></p>
-            
-            <div class="input-group">
-                <p>輸入名字記錄成績（選填）：</p>
-                <input type="text" id="playerNameInput" placeholder="你的名字..." maxlength="10">
-            </div>
-
+            <input type="text" id="playerNameInput" placeholder="你的名字..." maxlength="10">
             <button class="btn-forest" onclick="submitAndRestart()">記錄並再玩一次</button>
             <button class="btn-forest" style="background: var(--leaf-green); color: var(--forest-green);" onclick="submitAndGoHome()">記錄並回首頁</button>
         </div>
 
-        <div id="rank-view" style="display: none;">
-            <h1 style="margin-top: 0; font-size: 2rem;">CMS認音大挑戰 - 高手排行榜</h1>
-            <div class="tab-group">
-                <button class="tab-btn active" onclick="updateRankUI('all')">全部</button>
-                <button class="tab-btn" onclick="updateRankUI(1)">LV 1</button>
-                <button class="tab-btn" onclick="updateRankUI(2)">LV 2</button>
-                <button class="tab-btn" onclick="updateRankUI(3)">LV 3</button>
-                <button class="tab-btn" onclick="updateRankUI(4)">LV 4</button>
-                <button class="tab-btn" onclick="updateRankUI(5)">LV 5</button>
-            </div>
-            <div style="max-height: 350px; overflow-y: auto; background: white; border-radius: 15px; width: 100%; margin: 10px 0;">
+        <div id="rank-view" style="display: none; width: 95%;">
+            <h1 style="font-size: 2rem;">高手排行榜</h1>
+            <div id="rank-body-container" style="max-height: 350px; overflow-y: auto; background: white; border-radius: 15px; width: 100%; margin: 10px 0;">
                 <table class="rank-table">
                     <thead><tr><th>排名</th><th>名稱</th><th>LV</th><th>分數</th><th>耗時</th><th>日期</th></tr></thead>
                     <tbody id="rank-body"></tbody>
                 </table>
             </div>
-            <button class="btn-forest" style="width: 200px; margin-top: 10px;" onclick="goHome()">回首頁</button>
+            <button class="btn-forest" style="width: 200px;" onclick="goHome()">回首頁</button>
         </div>
     </div>
 </div>
@@ -272,9 +250,13 @@
     let startTime, endTime;
 
     const s = 91; // 線距
-    const clefOffset = 35; // 低音譜號垂直微調位置
 
-    // 依據教學需求定義 Level 音域 (由上而下)
+    /* 座標系統重構：絕對座標定義 */
+    const canvasCenterY = canvas.height / 2; // 畫布垂直中心
+    const baseLine3Y = canvasCenterY;        // Level 5 的第三線固定在中心
+    const baseBottomY = baseLine3Y + 2 * s;  // Level 5 的第五線（最底線）位置
+
+    // 各等級學習音高
     const notesMap = {
         1: ["C4", "B3", "A3"],
         2: ["C4", "B3", "A3", "G3", "F3"],
@@ -283,70 +265,59 @@
         5: ["C4", "B3", "A3", "G3", "F3", "E3", "D3", "C3", "B2", "A2", "G2", "F2", "E2"]
     };
 
-    const animalImgs = {
-        'C': 'cat-h.PNG', 'B': 'bear-h.PNG', 'A': 'ape-h.PNG', 
-        'G': 'giraffe-h.PNG', 'F': 'frog-h.PNG', 'E': 'elephant-h.PNG', 'D': 'dog-h.PNG'
+    // 動物圖片路徑與備援 Emoji
+    const animalConfig = {
+        'C': { img: 'images/cat-h.PNG', emoji: '🐱' },
+        'B': { img: 'images/bear-h.PNG', emoji: '🐻' },
+        'A': { img: 'images/ape-h.PNG', emoji: '🦧' },
+        'G': { img: 'images/giraffe-h.PNG', emoji: '🦒' },
+        'F': { img: 'images/frog-h.PNG', emoji: '🐸' },
+        'E': { img: 'images/elephant-h.PNG', emoji: '🐘' },
+        'D': { img: 'images/dog-h.PNG', emoji: '🐶' }
     };
 
-    // 以第五線(Top Line)為基準 0，向上為正，向下為負
+    /* 座標系統重構：stepData 基準點改為最底線 (Step 0 = G2) */
     const stepData = {
-        "C4": 2,  // 上加一線
-        "B3": 1,  // 第五線上
-        "A3": 0,  // 第五線
-        "G3": -1, // 四五間
-        "F3": -2, // 第四線
-        "E3": -3, // 三四間
-        "D3": -4, // 第三線
-        "C3": -5, // 二三間
-        "B2": -6, // 第二線
-        "A2": -7, // 一二間
-        "G2": -8, // 第一線
-        "F2": -9, // 第一線下
-        "E2": -10 // 下加一線
+        "C4": 10, "B3": 9, "A3": 8, "G3": 7, "F3": 6, "E3": 5, "D3": 4, "C3": 3, "B2": 2, "A2": 1, "G2": 0, "F2": -1, "E2": -2
     };
 
     function drawScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 置中基準：以完整的五線譜高度來計算畫布中心
-        const totalStaffHeight = 4 * s;
-        const topLineY = (canvas.height - totalStaffHeight) / 2;
-
         ctx.strokeStyle = "#333";
         ctx.lineWidth = 5;
         
-        // 畫五線譜：由上而下畫線 (從第5線開始往下畫)
-        // Level 1 畫1條線, Level 2 畫2條線... Level 5 畫5條線
-        const linesToDraw = curLv; 
-        for (let i = 0; i < linesToDraw; i++) {
-            let y = topLineY + (i * s);
+        /* 最低線對齊繪製邏輯 */
+        // 從最底線 (baseBottomY) 開始，往上畫 curLv 條線
+        for (let i = 0; i < curLv; i++) {
+            let y = baseBottomY - (i * s);
             ctx.beginPath(); 
             ctx.moveTo(100, y); 
             ctx.lineTo(900, y); 
             ctx.stroke();
         }
 
-        // 低音譜號 (𝄢) 繪製
-        // 低音譜號的圓點應位在第四線 (topLineY + s)
+        /* 低音譜號位置固定 (參考 Level 5 的第四線) */
+        // 第四線的座標永遠是 baseBottomY - 1*s
+        const clefLine4Y = baseBottomY - s;
         ctx.fillStyle = "#111"; 
         ctx.font = `${s * 7.5}px serif`; 
-        ctx.fillText("𝄢", 110, topLineY + s + clefOffset);
+        // 𝄢 符號的繪製基準點微調，使其圓點落在第四線
+        ctx.fillText("𝄢", 110, clefLine4Y + 35); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
-            // 由於 stepData 是以 topLineY 為 0 (往上正，往下負)，
-            // 繪製 Y = 第一線 Y - (位移 * 半個線距)
-            const y = topLineY - (steps * (s / 2));
+            /* 音符 Y 座標公式：基於 baseBottomY 計算 */
+            const y = baseBottomY - (steps * (s / 2));
             const x = canvas.width / 2 + 50;
 
             ctx.fillStyle = "black";
             ctx.beginPath();
-            // 音符大小維持縮小 10% 設定
             ctx.ellipse(x, y, s * 0.666, s * 0.477, -Math.PI / 8, 0, 2 * Math.PI);
             ctx.fill();
 
-            // 處理加線 (上加一線 C4 或 下加一線 E2)
-            if (targetNote === "C4" || targetNote === "E2") {
+            // 繪製加線 (上加線 C4 或 下加線 E2)
+            if (steps >= 10 || steps <= -2) {
                 ctx.beginPath(); 
                 ctx.moveTo(x - s, y); 
                 ctx.lineTo(x + s, y); 
@@ -374,24 +345,22 @@
         
         targetNote = nextNote;
         lastTargetNote = nextNote;
-        
         document.getElementById('count-display').innerText = `${11 - questionsLeft} / 10`;
         drawScene();
         generateChoices(targetNote.charAt(0));
     }
 
     function generateChoices(correctLetter) {
-        // 從所有動物中挑選
         const allLetters = ['C', 'B', 'A', 'G', 'F', 'E', 'D'];
         let choices = [correctLetter];
         let others = allLetters.filter(l => l !== correctLetter).sort(() => Math.random() - 0.5);
-        
         while (choices.length < 3) choices.push(others.pop());
         choices.sort(() => Math.random() - 0.5);
 
         const area = document.getElementById('answer-area');
         area.innerHTML = '';
         choices.forEach(letter => {
+            const config = animalConfig[letter];
             const btn = document.createElement('button');
             btn.className = 'animal-btn';
             btn.onclick = () => {
@@ -402,8 +371,11 @@
                 questionsLeft--;
                 if (questionsLeft > 0) nextQuestion(); else showResult();
             };
+            // 圖片顯示機制：若 onerror 則顯示 Emoji
             btn.innerHTML = `
-                <img src="${animalImgs[letter]}" class="animal-img" onerror="this.src='https://via.placeholder.com/90?text=${letter}'">
+                <div class="img-container">
+                    <img src="${config.img}" class="animal-img" onerror="this.style.display='none'; this.parentElement.innerText='${config.emoji}';">
+                </div>
                 <div class="letter-name">${letter}</div>
             `;
             area.appendChild(btn);
@@ -415,9 +387,7 @@
         const duration = Math.floor((endTime - startTime) / 1000);
         document.getElementById('overlay').style.display = 'flex';
         document.getElementById('menu-view').style.display = 'none';
-        document.getElementById('rank-view').style.display = 'none';
         document.getElementById('result-view').style.display = 'block';
-        
         document.getElementById('result-text').innerText = `獲得分數：${score} / 10`;
         document.getElementById('time-text').innerText = `耗時：${duration} 秒`;
     }
@@ -427,39 +397,19 @@
         const nameInput = document.getElementById('playerNameInput').value.trim();
         const finalName = nameInput || "匿名";
         const record = { name: finalName, lv: curLv, score, time: duration, date: new Date().toLocaleDateString() };
-        let history = JSON.parse(localStorage.getItem('cmsNoteRankBass') || "[]");
+        let history = JSON.parse(localStorage.getItem('cmsNoteRankBassCoord') || "[]");
         history.push(record);
-        localStorage.setItem('cmsNoteRankBass', JSON.stringify(history));
-        document.getElementById('playerNameInput').value = ""; 
+        localStorage.setItem('cmsNoteRankBassCoord', JSON.stringify(history));
     }
 
-    function submitAndRestart() {
-        saveRecord();
-        startGame(curLv);
-    }
-
-    function submitAndGoHome() {
-        saveRecord();
-        goHome();
-    }
+    function submitAndRestart() { saveRecord(); startGame(curLv); }
+    function submitAndGoHome() { saveRecord(); goHome(); }
 
     function showRank() {
         document.getElementById('menu-view').style.display = 'none';
-        document.getElementById('result-view').style.display = 'none';
         document.getElementById('rank-view').style.display = 'flex';
-        updateRankUI('all');
-    }
-
-    function updateRankUI(filter) {
-        document.querySelectorAll('.tab-btn').forEach(t => {
-            if(filter === 'all') t.classList.toggle('active', t.innerText === '全部');
-            else t.classList.toggle('active', t.innerText === `LV ${filter}`);
-        });
-
-        let data = JSON.parse(localStorage.getItem('cmsNoteRankBass') || "[]");
-        if (filter !== 'all') data = data.filter(d => d.lv === parseInt(filter));
+        let data = JSON.parse(localStorage.getItem('cmsNoteRankBassCoord') || "[]");
         data.sort((a, b) => (b.score - a.score) || (a.time - b.time));
-        
         const body = document.getElementById('rank-body');
         body.innerHTML = data.slice(0, 15).map((d, i) => `
             <tr><td>${i+1}</td><td>${d.name}</td><td>${d.lv}</td><td>${d.score}</td><td>${d.time}s</td><td>${d.date}</td></tr>
@@ -471,6 +421,7 @@
         document.getElementById('menu-view').style.display = 'block';
         document.getElementById('result-view').style.display = 'none';
         document.getElementById('rank-view').style.display = 'none';
+        drawScene();
     }
 
     window.onload = () => drawScene();
