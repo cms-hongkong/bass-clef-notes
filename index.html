@@ -311,10 +311,10 @@
         /* 低音譜號繪製位置：圓點位於從上往下數第四條線 */
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
-        /* 低音譜號再縮細 10% (由 6.75 變為 6.075) */
+        /* 低音譜號縮細 10% (由 6.75 減至 6.075) */
         ctx.font = `${s * 6.075}px serif`; 
-        /* 低音譜號下移80px */
-        ctx.fillText("𝄢", 110, clefLine4Y + 35 + 80); 
+        /* 低音譜號移高 20px (原本偏移量 35+80=115 改為 115-20=95) */
+        ctx.fillText("𝄢", 110, clefLine4Y + 95); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
@@ -363,6 +363,7 @@
         generateChoices(targetNote.charAt(0));
     }
 
+    /* 答對答錯視覺輔助函數 */
     function showCorrectEffect(btn, letterSpan, letter) {
         btn.style.background = "#90EE90";
         letterSpan.innerText = "✔️ " + letter;
