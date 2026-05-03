@@ -129,7 +129,7 @@
             white-space: nowrap;
         }
 
-        /* 答對/答錯視覺效果：CSS 部分 */
+        /* 答對答錯效果：加入抖動動畫 */
         @keyframes shakeEffect {
             0% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -260,7 +260,7 @@
     let lastTargetNote = "";
     let questionsLeft = 10;
     let startTime, endTime;
-    let isAnswering = false; /* 答對/答錯視覺效果：防止連點開關 */
+    let isAnswering = false; /* 答對答錯效果：防止連點變數 */
 
     const s = 91; 
 
@@ -306,15 +306,15 @@
 
         const clefLine4Y = baseBottomY - s;
         ctx.fillStyle = "#111"; 
-        ctx.font = `${s * 7.5}px serif`; 
-        /* 低音譜號下移80px */
+        /* 低音譜號縮小10%：從 7.5 改為 6.75 */
+        ctx.font = `${s * 6.75}px serif`; 
         ctx.fillText("𝄢", 110, clefLine4Y + 35 + 80); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
             const y = baseBottomY - (steps * (s / 2));
-            /* 音符右移40px */
-            const x = (canvas.width / 2 + 50) + 40; 
+            /* 音符右移40px：從 +50 改為 +90 */
+            const x = canvas.width / 2 + 90; 
 
             ctx.fillStyle = "black";
             ctx.beginPath();
@@ -341,7 +341,7 @@
     }
 
     function nextQuestion() {
-        isAnswering = false; /* 答對/答錯視覺效果：重置答題狀態 */
+        isAnswering = false; /* 答對答錯效果：重置答題狀態 */
         const pool = notesMap[curLv];
         let nextNote;
         do {
@@ -355,7 +355,7 @@
         generateChoices(targetNote.charAt(0));
     }
 
-    /* 答對/答錯視覺效果：輔助函數 */
+    /* 答對答錯效果：加入輔助函數 */
     function showCorrectEffect(btn, letterSpan, letter) {
         btn.style.background = "#90EE90";
         letterSpan.innerText = "✔️ " + letter;
@@ -382,13 +382,13 @@
             const btn = document.createElement('button');
             btn.className = 'animal-btn';
             
-            // 建立獨立的 letterDiv 元素（顯示字母及臨時符號）
+            /* 答對答錯效果：為每個按鈕建立獨立的 letterDiv */
             const letterDiv = document.createElement('div');
             letterDiv.className = 'letter-name';
             letterDiv.innerText = letter;
 
             btn.onclick = () => {
-                /* 答對/答錯視覺效果：判斷邏輯 */
+                /* 答對答錯效果：判斷邏輯與延遲 */
                 if (isAnswering) return;
                 isAnswering = true;
 
@@ -400,7 +400,6 @@
                     showWrongEffect(btn, letterDiv, letter);
                 }
 
-                // 延遲 0.4 秒後恢復並進入下一題
                 setTimeout(() => {
                     btn.style.background = "#FFF";
                     letterDiv.innerText = letter;
