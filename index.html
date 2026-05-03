@@ -306,12 +306,18 @@
             ctx.moveTo(100, y); 
             ctx.lineTo(900, y); 
             ctx.stroke();
+
+            /* 在每條線右側加上編號（15px紅色） */
+            ctx.font = "15px var(--text-serif)";
+            ctx.fillStyle = "#E63946";
+            ctx.textAlign = "right";
+            ctx.fillText(i + 1, 880, y + 6);
         }
 
         /* 低音譜號繪製位置：圓點位於從上往下數第四條線 */
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
-        /* 低音譜號再縮細 10% (原本 6.75 改為 6.075) */
+        /* 低音譜號縮細 10% (原本 6.75 改為 6.075) */
         ctx.font = `${s * 6.075}px serif`; 
         /* 低音譜號下移量減少 20px (原本 35+80=115 改為 95)，即移高 20px */
         ctx.fillText("𝄢", 110, clefLine4Y + 95); 
