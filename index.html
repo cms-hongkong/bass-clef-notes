@@ -129,7 +129,6 @@
             white-space: nowrap;
         }
 
-        /* 答對答錯視覺效果動畫 */
         @keyframes shakeEffect {
             0% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -264,10 +263,8 @@
 
     const s = 91; 
 
-    /* 座標系統計算方式：以 Level 5 的第三線垂直置中於畫布 */
     const canvasCenterY = canvas.height / 2; 
     const baseLine3Y = canvasCenterY;        
-    /* 基準點改為最上面那條線（第五線／第一線基準） */
     const baseTopY = baseLine3Y - 2 * s;  
 
     const notesMap = {
@@ -288,7 +285,6 @@
         'D': { img: 'images/dog-h.PNG', emoji: '🐶' }
     };
 
-    /* stepData：0 對應最上面那條線，正值往下，負值往上 */
     const stepData = {
         "C4": -2, "B3": -1, "A3": 0, "G3": 1, "F3": 2, "E3": 3, "D3": 4, "C3": 5, "B2": 6, "A2": 7, "G2": 8, "F2": 9, "E2": 10
     };
@@ -306,21 +302,22 @@
             ctx.moveTo(100, y); 
             ctx.lineTo(900, y); 
             ctx.stroke();
+
+            /* 在線條左側加上編號標籤 */
+            ctx.fillStyle = "#604439"; // wood-brown
+            ctx.font = "bold 20px var(--text-serif)";
+            ctx.textAlign = "left";
+            ctx.fillText(i + 1, 65, y + 8);
         }
 
-        /* 低音譜號繪製位置：圓點位於從上往下數第四條線 */
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
-        /* 低音譜號縮小10% */
         ctx.font = `${s * 6.75}px serif`; 
-        /* 低音譜號下移80px */
         ctx.fillText("𝄢", 110, clefLine4Y + 35 + 80); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
-            /* 音符繪製公式：基準點改為最上面那條線 */
             const y = baseTopY + (steps * (s / 2));
-            /* 音符右移40px (保留先前設定為 +90) */
             const x = canvas.width / 2 + 90; 
 
             ctx.fillStyle = "black";
@@ -328,7 +325,6 @@
             ctx.ellipse(x, y, s * 0.666, s * 0.477, -Math.PI / 8, 0, 2 * Math.PI);
             ctx.fill();
 
-            // 繪製加線 (上加線 C4 或 下加線 E2)
             if (steps <= -2 || steps >= 10) {
                 ctx.beginPath(); 
                 ctx.moveTo(x - s, y); 
@@ -349,7 +345,7 @@
     }
 
     function nextQuestion() {
-        isAnswering = false; /* 重置答題狀態 */
+        isAnswering = false; 
         const pool = notesMap[curLv];
         let nextNote;
         do {
@@ -363,7 +359,6 @@
         generateChoices(targetNote.charAt(0));
     }
 
-    /* 答對答錯視覺輔助函數 */
     function showCorrectEffect(btn, letterSpan, letter) {
         btn.style.background = "#90EE90";
         letterSpan.innerText = "✔️ " + letter;
