@@ -129,7 +129,6 @@
             white-space: nowrap;
         }
 
-        /* 答對答錯視覺效果動畫 */
         @keyframes shakeEffect {
             0% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -264,10 +263,8 @@
 
     const s = 91; 
 
-    /* 座標系統計算方式：以 Level 5 的第三線垂直置中於畫布 */
     const canvasCenterY = canvas.height / 2; 
     const baseLine3Y = canvasCenterY;        
-    /* 基準點改為最上面那條線（第五線／第一線基準） */
     const baseTopY = baseLine3Y - 2 * s;  
 
     const notesMap = {
@@ -288,7 +285,6 @@
         'D': { img: 'images/dog-h.PNG', emoji: '🐶' }
     };
 
-    /* stepData：0 對應最上面那條線，正值往下，負值往上 */
     const stepData = {
         "C4": -2, "B3": -1, "A3": 0, "G3": 1, "F3": 2, "E3": 3, "D3": 4, "C3": 5, "B2": 6, "A2": 7, "G2": 8, "F2": 9, "E2": 10
     };
@@ -296,37 +292,44 @@
     function drawScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        ctx.strokeStyle = "#333";
         ctx.lineWidth = 5;
         
         /* 線條從上往下畫 */
         for (let i = 0; i < curLv; i++) {
             let y = baseTopY + (i * s); 
+            
+            /* 線條顏色：第1條紅色、第2條橙色、第3條黃色、第4條綠色、第5條紫色 */
+            const lineNumber = i + 1;
+            const colors = {
+                1: "#FF0000", // 紅色
+                2: "#FFA500", // 橙色
+                3: "#FFD700", // 深黃色 (金)
+                4: "#008000", // 綠色
+                5: "#800080"  // 紫色
+            };
+            ctx.strokeStyle = colors[lineNumber];
+            
             ctx.beginPath(); 
             ctx.moveTo(100, y); 
             ctx.lineTo(900, y); 
             ctx.stroke();
 
-            /* 在每條線右側加上編號（15px紅色） */
-            ctx.font = "15px var(--text-serif)";
-            ctx.fillStyle = "#E63946";
-            ctx.textAlign = "right";
-            ctx.fillText(i + 1, 880, y + 6);
+            // 繪製線編號標籤 (保持原本位置)
+            ctx.font = "bold 20px var(--text-serif)";
+            ctx.fillStyle = "#604439"; 
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText(i + 1, 20, y);
         }
 
-        /* 低音譜號繪製位置：圓點位於從上往下數第四條線 */
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
-        /* 低音譜號縮細 10% (原本 6.75 改為 6.075) */
         ctx.font = `${s * 6.075}px serif`; 
-        /* 低音譜號下移量減少 20px (原本 35+80=115 改為 95)，即移高 20px */
         ctx.fillText("𝄢", 110, clefLine4Y + 95); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
-            /* 音符繪製公式：基準點改為最上面那條線 */
             const y = baseTopY + (steps * (s / 2));
-            /* 音符右移 10% (畫布寬 1000 * 0.1 = 100px)，原本 +90 改為 +190 */
             const x = canvas.width / 2 + 190; 
 
             ctx.fillStyle = "black";
@@ -334,8 +337,9 @@
             ctx.ellipse(x, y, s * 0.666, s * 0.477, -Math.PI / 8, 0, 2 * Math.PI);
             ctx.fill();
 
-            // 繪製加線 (上加線 C4 或 下加線 E2)
+            // 繪製加線 (中央C C4 或 低音E E2)
             if (steps <= -2 || steps >= 10) {
+                ctx.strokeStyle = "#333"; // 加線用深灰色
                 ctx.beginPath(); 
                 ctx.moveTo(x - s, y); 
                 ctx.lineTo(x + s, y); 
@@ -355,7 +359,7 @@
     }
 
     function nextQuestion() {
-        isAnswering = false; /* 重置答題狀態 */
+        isAnswering = false; 
         const pool = notesMap[curLv];
         let nextNote;
         do {
@@ -369,7 +373,6 @@
         generateChoices(targetNote.charAt(0));
     }
 
-    /* 答對答錯視覺輔助函數 */
     function showCorrectEffect(btn, letterSpan, letter) {
         btn.style.background = "#90EE90";
         letterSpan.innerText = "✔️ " + letter;
