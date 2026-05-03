@@ -311,8 +311,8 @@
         /* 低音譜號繪製位置：圓點位於從上往下數第四條線 */
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
-        /* 低音譜號縮小10% */
-        ctx.font = `${s * 6.75}px serif`; 
+        /* 低音譜號再縮細 10% (由 6.75 變為 6.075) */
+        ctx.font = `${s * 6.075}px serif`; 
         /* 低音譜號下移80px */
         ctx.fillText("𝄢", 110, clefLine4Y + 35 + 80); 
 
@@ -363,7 +363,6 @@
         generateChoices(targetNote.charAt(0));
     }
 
-    /* 答對答錯視覺輔助函數 */
     function showCorrectEffect(btn, letterSpan, letter) {
         btn.style.background = "#90EE90";
         letterSpan.innerText = "✔️ " + letter;
