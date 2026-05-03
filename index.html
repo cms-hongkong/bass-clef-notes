@@ -297,39 +297,38 @@
         /* 線條從上往下畫 */
         for (let i = 0; i < curLv; i++) {
             let y = baseTopY + (i * s); 
-            
+
             /* 線條顏色：第1條紅色、第2條橙色、第3條黃色、第4條綠色、第5條紫色 */
             const lineNumber = i + 1;
             const colors = {
                 1: "#FF0000", // 紅色
                 2: "#FFA500", // 橙色
-                3: "#FFD700", // 深黃色 (金)
+                3: "#FFD700", // 金黃色
                 4: "#008000", // 綠色
                 5: "#800080"  // 紫色
             };
             ctx.strokeStyle = colors[lineNumber];
-            
+
             ctx.beginPath(); 
             ctx.moveTo(100, y); 
             ctx.lineTo(900, y); 
             ctx.stroke();
 
-            // 繪製線編號標籤 (保持原本位置)
-            ctx.font = "bold 20px var(--text-serif)";
-            ctx.fillStyle = "#604439"; 
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillText(i + 1, 20, y);
+            /* 已移除線編號數字 */
+            // 原本顯示數字嘅 code 已經刪除
         }
 
         const clefLine4Y = baseTopY + 3 * s;
         ctx.fillStyle = "#111"; 
+        /* 低音譜號縮細 10% */
         ctx.font = `${s * 6.075}px serif`; 
+        /* 低音譜號移高 20px */
         ctx.fillText("𝄢", 110, clefLine4Y + 95); 
 
         if (targetNote) {
             const steps = stepData[targetNote]; 
             const y = baseTopY + (steps * (s / 2));
+            /* 音符右移 10% (畫布寬 1000 * 0.1 = 100px) */
             const x = canvas.width / 2 + 190; 
 
             ctx.fillStyle = "black";
@@ -337,9 +336,9 @@
             ctx.ellipse(x, y, s * 0.666, s * 0.477, -Math.PI / 8, 0, 2 * Math.PI);
             ctx.fill();
 
-            // 繪製加線 (中央C C4 或 低音E E2)
+            // 繪製加線 (上加線 C4 或 下加線 E2)
             if (steps <= -2 || steps >= 10) {
-                ctx.strokeStyle = "#333"; // 加線用深灰色
+                ctx.strokeStyle = "#333"; // 固定加線為深灰色
                 ctx.beginPath(); 
                 ctx.moveTo(x - s, y); 
                 ctx.lineTo(x + s, y); 
