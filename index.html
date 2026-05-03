@@ -302,13 +302,11 @@
             ctx.lineTo(900, y); 
             ctx.stroke();
 
-            /* 線編號改為紅色，大小為間距的90% */
-            const fontSize = s * 0.9;
+            /* 線編號縮小10倍，調整為間距的9%，並微調 Y 位置 */
             ctx.fillStyle = "#E63946"; // 紅色
-            ctx.font = `${fontSize}px var(--text-serif)`;
+            ctx.font = `${s * 0.09}px var(--text-serif)`;
             ctx.textAlign = "left";
-            /* Y 座標微調：線條 Y + 字體大小的 0.6 倍，達到垂直置中對齊 */
-            ctx.fillText(i + 1, 65, y + (fontSize * 0.6));
+            ctx.fillText(i + 1, 65, y + 6);
         }
 
         const clefLine4Y = baseTopY + 3 * s;
